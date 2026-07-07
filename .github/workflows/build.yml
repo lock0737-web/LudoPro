@@ -1,0 +1,50 @@
+name: Build Ludo Pro APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Initialize Capacitor Android Project
+        run: |
+          npx cap add android
+          npx cap sync
+
+      - name: Generate App Icon
+        run: |
+          npx capacitor-assets generate --iconBackgroundColor '#0F172A' --assetPath ./www/assets
+          npx cap sync android
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build APK (Debug)
+        working-directory: ./android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ludo-Pro-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
