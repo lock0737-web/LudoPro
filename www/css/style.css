@@ -1,0 +1,552 @@
+/* ==========================================================================
+   ملف style.css - التنسيقات الشاملة للعبة (Ludo Pro - AAA Edition)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+
+/* ==========================================
+   1. المتغيرات العامة (Variables)
+   ========================================== */
+:root {
+    /* ألوان واجهة المستخدم الأساسية */
+    --bg-color: #0F172A;
+    --panel-bg: #1E293B;
+    --text-main: #F8FAFC;
+    --primary: #3B82F6;
+
+    /* ألوان لوحة اللودو القياسية */
+    --ludo-red: #E53935;
+    --ludo-green: #43A047;
+    --ludo-yellow: #FDD835;
+    --ludo-blue: #1E88E5;
+    
+    /* إعدادات اللوحة الهندسية */
+    --board-bg: #FFFFFF;
+    --line-color: #B0BEC5;
+    --safe-star-color: rgba(0, 0, 0, 0.15);
+    
+    /* حساب حجم المربع الواحد للشبكة (15x15) بدقة مطلقة */
+    --cell-size: calc(100% / 15);
+}
+
+/* ==========================================
+   2. إعادة الضبط (Reset) وإعدادات الجسم
+   ========================================== */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Tajawal', sans-serif; 
+    user-select: none; /* منع تحديد النصوص أثناء اللعب */
+    -webkit-tap-highlight-color: transparent; /* منع وميض النقر في الهواتف */
+}
+
+body { 
+    background: var(--bg-color); 
+    color: var(--text-main); 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh;
+}
+
+/* ==========================================
+   3. التحكم بالشاشات (Screens Management)
+   ========================================== */
+.screen-container { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: opacity 0.3s ease; 
+    z-index: 10;
+}
+
+.hidden { 
+    display: none !important; 
+    opacity: 0; 
+    pointer-events: none; 
+}
+
+.active { 
+    display: flex; 
+    opacity: 1; 
+}
+
+/* ==========================================
+   4. تأثيرات الواجهة الاحترافية للألعاب (AAA Game UI)
+   ========================================== */
+
+/* اللوحات الزجاجية (Glassmorphism Panels) */
+.game-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.05);
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* لمعة معدنية متحركة داخل اللوحات (Shine Effect) */
+.game-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(45deg);
+    animation: panel-shine 6s infinite;
+    pointer-events: none;
+}
+@keyframes panel-shine { 
+    0% { transform: rotate(45deg) translateY(-100%); } 
+    100% { transform: rotate(45deg) translateY(100%); } 
+}
+
+/* أزرار الألعاب ثلاثية الأبعاد (3D Game Buttons) */
+.btn-3d {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.btn-green {
+    background: linear-gradient(to bottom, #4ade80, #16a34a);
+    box-shadow: 0 6px 0 #14532d, 0 15px 20px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,0.4);
+    border: 1px solid #bbf7d0;
+}
+
+.btn-blue {
+    background: linear-gradient(to bottom, #60a5fa, #2563eb);
+    box-shadow: 0 6px 0 #1e3a8a, 0 15px 20px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,0.4);
+    border: 1px solid #bfdbfe;
+}
+
+.btn-red {
+    background: linear-gradient(to bottom, #f87171, #dc2626);
+    box-shadow: 0 6px 0 #7f1d1d, 0 15px 20px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,0.4);
+    border: 1px solid #fecaca;
+}
+
+/* حركة الضغط الواقعية للأزرار */
+.btn-3d:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #14532d, 0 5px 10px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,0.2);
+}
+
+/* حقول الإدخال الاحترافية */
+.input-game {
+    width: 100%;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #334155;
+    border-radius: 12px;
+    color: #F8FAFC;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+.input-game:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* الشريط العلوي للوبي (Top Navbar) */
+.top-navbar {
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(15,23,42,0.9), transparent);
+    z-index: 50;
+}
+.nav-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(0,0,0,0.4); padding: 5px 15px 5px 5px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
+.nav-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #FBBF24; background: #1E293B; }
+.nav-info { display: flex; flex-direction: column; }
+.nav-coins { color: #FBBF24; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 4px; }
+.nav-btns { display: flex; gap: 10px; }
+.icon-btn { background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; color: white; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
+.icon-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+/* ==========================================
+   5. واجهات تسجيل الدخول واللوبي (القديمة للاحتياط)
+   ========================================== */
+.login-box { 
+    background: var(--panel-bg); 
+    padding: 40px; 
+    border-radius: 16px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+    text-align: center; 
+    width: 90%; 
+    max-width: 400px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+}
+
+.logo-title { 
+    font-size: 32px; 
+    font-weight: bold; 
+    margin-bottom: 30px; 
+    letter-spacing: 2px; 
+    color: var(--primary); 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.input-group { 
+    margin-bottom: 20px; 
+    text-align: right; 
+}
+
+.input-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-size: 14px; 
+    color: #94A3B8; 
+}
+
+.input-group input { 
+    width: 100%; 
+    padding: 12px; 
+    border-radius: 8px; 
+    border: 1px solid #334155; 
+    background: #0F172A; 
+    color: white; 
+    outline: none; 
+    font-size: 16px; 
+}
+
+.btn { 
+    width: 100%; 
+    padding: 14px; 
+    border-radius: 8px; 
+    border: none; 
+    font-size: 16px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: transform 0.1s, opacity 0.2s; 
+    margin-top: 10px; 
+}
+
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-google { background: #10B981; color: white; } /* تم التعديل لتناسب الزائر */
+.btn-primary { background: var(--primary); color: white; }
+
+#player-info-preview { 
+    margin-top: 20px; 
+    padding-top: 20px; 
+    border-top: 1px solid #334155; 
+}
+
+.player-id-text { 
+    font-size: 18px; 
+    font-weight: bold; 
+    margin-bottom: 15px; 
+    color: #10B981; 
+}
+
+/* ==========================================
+   6. حاوية اللعبة ولوحة اللودو (Game Board Engine)
+   ========================================== */
+.game-wrapper { 
+    width: 100%; 
+    max-width: 550px; 
+    padding: 10px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+.board-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--board-bg);
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 0 4px #2C3E50;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.grid-layer { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    display: grid; 
+    grid-template-columns: repeat(15, 1fr); 
+    grid-template-rows: repeat(15, 1fr); 
+    z-index: 1; 
+}
+
+.cell { 
+    border-right: 1px solid var(--line-color); 
+    border-bottom: 1px solid var(--line-color); 
+    position: relative; 
+}
+
+.cell:nth-child(15n) { border-right: none; }
+.cell:nth-last-child(-n+15) { border-bottom: none; }
+
+.safe-star::after {
+    content: '★'; 
+    position: absolute; 
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--safe-star-color); 
+    font-size: clamp(14px, 4vw, 24px);
+}
+
+.base-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+.base-box { position: absolute; width: calc(6 * var(--cell-size)); height: calc(6 * var(--cell-size)); display: flex; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.2); }
+.base-box.red { top: 0; left: 0; background: var(--ludo-red); }
+.base-box.green { top: 0; right: 0; background: var(--ludo-green); }
+.base-box.yellow { bottom: 0; right: 0; background: var(--ludo-yellow); }
+.base-box.blue { bottom: 0; left: 0; background: var(--ludo-blue); }
+
+.base-white-inner { width: 66.66%; height: 66.66%; background: #FFFFFF; border-radius: 20%; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.1); }
+
+.holes-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
+.base-hole { position: absolute; width: calc(var(--cell-size) * 1.4); height: calc(var(--cell-size) * 1.4); background: #ECEFF1; border-radius: 50%; box-shadow: inset 0 3px 6px rgba(0,0,0,0.4); transform: translate(-50%, -50%); }
+
+.center-home { position: absolute; top: calc(6 * var(--cell-size)); left: calc(6 * var(--cell-size)); width: calc(3 * var(--cell-size)); height: calc(3 * var(--cell-size)); z-index: 4; pointer-events: none; }
+
+/* ==========================================
+   7. البيادق وأنيميشن الحركة (Pawns)
+   ========================================== */
+.pawns-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
+
+.pawn {
+    position: absolute; 
+    width: calc(var(--cell-size) * 0.85); 
+    height: calc(var(--cell-size) * 0.85);
+    border-radius: 50%; 
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 5px 8px rgba(0,0,0,0.6), inset 0 -3px 5px rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%);
+    transition: top 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s;
+    cursor: pointer; 
+    pointer-events: auto;
+}
+
+.pawn.red { background: radial-gradient(circle at 35% 35%, #FF8A80, var(--ludo-red)); }
+.pawn.green { background: radial-gradient(circle at 35% 35%, #B9F6CA, var(--ludo-green)); }
+.pawn.yellow { background: radial-gradient(circle at 35% 35%, #FFF59D, var(--ludo-yellow)); }
+.pawn.blue { background: radial-gradient(circle at 35% 35%, #80D8FF, var(--ludo-blue)); }
+
+.pawn.highlight { animation: playable-pulse 1s infinite alternate; border-color: #FFEA00; z-index: 15; }
+@keyframes playable-pulse { 
+    0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 10px #FFEA00; } 
+    100% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 25px #FFEA00; } 
+}
+
+/* ==========================================
+   8. لوحة التحكم السفلية (Bottom UI Panel)
+   ========================================== */
+.ui-panel { 
+    width: 100%; 
+    margin-top: 20px; 
+    background: var(--panel-bg); 
+    border-radius: 16px; 
+    padding: 15px 25px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.1); 
+}
+
+.player-info { display: flex; flex-direction: column; gap: 4px; }
+.player-name { font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
+.turn-indicator { font-size: 15px; font-weight: bold; transition: color 0.3s; }
+
+.moves-queue { display: flex; gap: 6px; min-height: 26px; align-items: center; }
+.move-badge { 
+    background: #334155; 
+    padding: 4px 10px; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    font-weight: bold; 
+    animation: pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+@keyframes pop-in { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* ==========================================
+   9. النرد ثلاثي الأبعاد (Pro 3D Dice)
+   ========================================== */
+.dice-container { perspective: 800px; cursor: pointer; width: 65px; height: 65px; }
+.dice { 
+    width: 100%; height: 100%; 
+    position: relative; 
+    transform-style: preserve-3d; 
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+.dice.rolling { animation: throw-dice 0.6s linear infinite; pointer-events: none; }
+@keyframes throw-dice { 
+    0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+    100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); } 
+}
+
+.face { 
+    position: absolute; width: 100%; height: 100%; 
+    background: #F8FAFC; border-radius: 12px; 
+    border: 1px solid #CBD5E1; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); 
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); 
+    padding: 8px; 
+}
+.dot { 
+    width: 12px; height: 12px; border-radius: 50%; 
+    background: #1E293B; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); 
+    justify-self: center; align-self: center; display: none; 
+}
+
+.face[data-val="1"] .dot:nth-child(5) { display: block; background: var(--ludo-red); width: 16px; height: 16px; }
+.face[data-val="2"] .dot:nth-child(1), .face[data-val="2"] .dot:nth-child(9) { display: block; }
+.face[data-val="3"] .dot:nth-child(1), .face[data-val="3"] .dot:nth-child(5), .face[data-val="3"] .dot:nth-child(9) { display: block; }
+.face[data-val="4"] .dot:nth-child(1), .face[data-val="4"] .dot:nth-child(3), .face[data-val="4"] .dot:nth-child(7), .face[data-val="4"] .dot:nth-child(9) { display: block; }
+.face[data-val="5"] .dot:nth-child(1), .face[data-val="5"] .dot:nth-child(3), .face[data-val="5"] .dot:nth-child(5), .face[data-val="5"] .dot:nth-child(7), .face[data-val="5"] .dot:nth-child(9) { display: block; }
+.face[data-val="6"] .dot:nth-child(1), .face[data-val="6"] .dot:nth-child(3), .face[data-val="6"] .dot:nth-child(4), .face[data-val="6"] .dot:nth-child(6), .face[data-val="6"] .dot:nth-child(7), .face[data-val="6"] .dot:nth-child(9) { display: block; }
+
+.front  { transform: translateZ(32.5px); }
+.back   { transform: rotateX(180deg) translateZ(32.5px); }
+.right  { transform: rotateY(90deg) translateZ(32.5px); }
+.left   { transform: rotateY(-90deg) translateZ(32.5px); }
+.top    { transform: rotateX(90deg) translateZ(32.5px); }
+.bottom { transform: rotateX(-90deg) translateZ(32.5px); }
+
+/* ==========================================
+   10. واجهة المحادثة الجماعية (In-Room Chat)
+   ========================================== */
+.chat-container {
+    position: absolute;
+    bottom: 95px; 
+    left: 10px;
+    right: 10px;
+    z-index: 50;
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    background: var(--panel-bg);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 12px 15px;
+    background: #334155;
+    color: white;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.chat-badge {
+    background: #EF4444;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.chat-body {
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #1E293B;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.chat-msg {
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 85%;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.msg-others { background: #334155; align-self: flex-start; border-bottom-right-radius: 0; }
+.msg-mine { background: var(--primary); align-self: flex-end; border-bottom-left-radius: 0; }
+.msg-sender { font-size: 11px; color: #CBD5E1; margin-bottom: 4px; font-weight: bold; }
+
+.chat-input-area {
+    display: flex;
+    padding: 10px;
+    background: #0F172A;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: none;
+    background: #1E293B;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+.btn-send {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    transition: transform 0.1s;
+}
+
+.btn-send:active { transform: scale(0.9); }
+
+/* زر الذكاء الاصطناعي */
+.btn-yellow {
+    background: linear-gradient(to bottom, #FCD34D, #F59E0B);
+    box-shadow: 0 6px 0 #B45309, 0 15px 20px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,0.4);
+    border: 1px solid #FEF3C7;
+    color: #1E293B;
+}
+.btn-yellow:active { box-shadow: 0 0 0 #B45309, 0 5px 10px rgba(0,0,0,0.4); }
