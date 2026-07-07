@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ludo Pro - Ultimate Multiplayer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- 1. شاشة تسجيل الدخول -->
+    <div id="login-screen" class="screen-container active">
+        <div class="login-box">
+            <h1 class="logo-title">LUDO PRO ©SUFI</h1>
+            <div class="input-group">
+                <label>الاسم:</label>
+                <input type="text" id="player-name-input" placeholder="أدخل اسمك الكريم هنا..." autocomplete="off">
+            </div>
+            <button id="btn-google-login" class="btn-3d btn-green">تسجيل الدخول وبدء اللعب</button>
+            <div id="player-info-preview" class="hidden">
+                <p class="player-id-text">المعرف الخاص بك (ID): <br><span id="preview-id" style="font-size: 24px; letter-spacing: 2px;">------</span></p>
+                <button id="btn-enter-game" class="btn-3d btn-blue" style="margin-top: 15px;">الدخول إلى اللوبي</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. شاشة اللوبي (تم إضافة اختيار عدد اللاعبين وبوت الذكاء الاصطناعي) -->
+    <div id="lobby-screen" class="screen-container hidden" style="background: url('assets/lobby-bg.jpg') center/cover;">
+        <div class="top-navbar">
+            <div class="nav-profile" id="btn-top-profile">
+                <img src="" alt="Avatar" class="nav-avatar" id="top-avatar">
+                <div class="nav-info">
+                    <span id="top-name" style="font-weight: bold; font-size: 15px;">---</span>
+                    <span class="nav-coins"><span id="top-coins">0</span> 🪙</span>
+                </div>
+            </div>
+            <div class="nav-btns">
+                <button class="icon-btn" id="btn-open-friends">👥</button>
+                <button class="icon-btn" id="btn-open-settings">⚙️</button>
+            </div>
+        </div>
+
+        <div class="game-panel" style="width: 90%; max-width: 400px; text-align: center; margin-top: 60px;">
+            <h1 style="color: var(--primary); margin-bottom: 20px; font-size: 35px; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">LUDO PRO</h1>
+            
+            <!-- تحديد عدد اللاعبين للغرف -->
+            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px;">
+                <label style="color: white; font-weight: bold; cursor: pointer;">
+                    <input type="radio" name="game-mode" value="2"> 2 لاعبين (متقابلين)
+                </label>
+                <label style="color: white; font-weight: bold; cursor: pointer;">
+                    <input type="radio" name="game-mode" value="4" checked> 4 لاعبين
+                </label>
+            </div>
+            
+            <button id="btn-quick-match" class="btn-3d btn-green" style="margin-bottom: 15px; font-size: 20px;">
+                ▶ لعب سريع (أونلاين)
+            </button>
+            
+            <button id="btn-play-ai" class="btn-3d btn-yellow" style="margin-bottom: 20px; font-size: 20px;">
+                🤖 لعب ضد الكمبيوتر
+            </button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="btn-create-room" class="btn-3d btn-blue" style="flex: 1;">إنشاء غرفة</button>
+                <button id="btn-join-room-modal" class="btn-3d btn-red" style="flex: 1;">انضمام 🔑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. شاشة اللعب -->
+    <div id="game-screen" class="screen-container hidden">
+        <div class="game-wrapper">
+            <div class="board-container" id="ludo-board" dir="ltr">
+                <div class="grid-layer" id="grid-layer"></div>
+                <div class="base-layer" id="base-layer">
+                    <div class="base-box red"><div class="base-white-inner"></div></div>
+                    <div class="base-box green"><div class="base-white-inner"></div></div>
+                    <div class="base-box yellow"><div class="base-white-inner"></div></div>
+                    <div class="base-box blue"><div class="base-white-inner"></div></div>
+                </div>
+                <div class="holes-layer" id="holes-layer"></div>
+                <div class="center-home" id="center-home">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+                        <polygon points="0,0 50,50 0,100" fill="#E53935" />   
+                        <polygon points="0,0 100,0 50,50" fill="#43A047" />   
+                        <polygon points="100,0 100,100 50,50" fill="#FDD835" /> 
+                        <polygon points="0,100 100,100 50,50" fill="#1E88E5" /> 
+                    </svg>
+                </div>
+                <div class="pawns-layer" id="pawns-layer"></div>
+            </div>
+
+            <div class="ui-panel">
+                <div class="player-info">
+                    <div class="player-name" id="display-name">---</div>
+                    <div class="turn-indicator" id="turn-display">جاري تجهيز اللعبة...</div>
+                    <div class="moves-queue" id="moves-queue"></div>
+                </div>
+                <div class="dice-container" id="dice-container" onclick="if(typeof LudoController !== 'undefined') LudoController.rollDice()">
+                    <div class="dice" id="main-dice">
+                        <div class="face front" data-val="1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="face back" data-val="6"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="face right" data-val="3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="face left" data-val="4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="face top" data-val="5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="face bottom" data-val="2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chat-container">
+                <div class="chat-header" id="chat-toggle-btn">
+                    <span>💬 المحادثة الجماعية</span>
+                    <span id="chat-badge" class="chat-badge hidden">0</span>
+                </div>
+                <div class="chat-body hidden" id="chat-body">
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="50">
+                        <button id="btn-send-chat" class="btn-send">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. شاشة نهاية اللعبة -->
+    <div id="win-screen" class="screen-container hidden" style="z-index: 100; background: rgba(15, 23, 42, 0.95);">
+        <div class="login-box" style="text-align: center; border: 2px solid #F59E0B; box-shadow: 0 0 50px rgba(245, 158, 11, 0.3);">
+            <h1 id="win-title" style="font-size: 45px; margin-bottom: 10px; color: #FBBF24;">🏆 فوز! 🏆</h1>
+            <p id="win-message" style="font-size: 20px; margin-bottom: 20px; font-weight: bold;">اللاعب فاز بالمباراة!</p>
+            <div id="win-rewards" class="hidden" style="background: #1E293B; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <p style="color: #94A3B8; font-size: 14px;">المكافآت المكتسبة:</p>
+                <p style="color: #10B981; font-size: 28px; font-weight: bold;">+500 🪙</p>
+            </div>
+            <button id="btn-back-to-lobby" class="btn-3d btn-blue">العودة للوبي</button>
+        </div>
+    </div>
+
+    <!-- 5. نافذة تعديل الملف الشخصي (تم إزالة حقل الصديق من هنا لمنع التعارض) -->
+    <div id="edit-profile-modal" class="screen-container hidden" style="z-index: 80; background: rgba(0,0,0,0.7);">
+        <div class="game-panel" style="width: 90%; max-width: 350px; text-align: center;">
+            <h2 style="color: #FBBF24; margin-bottom: 20px;">الملف الشخصي</h2>
+            <div style="position: relative; display: inline-block; margin-bottom: 20px;">
+                <img id="edit-avatar-preview" src="" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); background: #1E293B;">
+            </div>
+            <div class="input-group" style="text-align: right;">
+                <label style="color: #94A3B8;">تغيير الاسم:</label>
+                <input type="text" id="edit-name-input" class="input-game" maxlength="15">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button id="btn-save-profile" class="btn-3d btn-green" style="flex: 1;">حفظ ✔️</button>
+                <button id="btn-close-edit" class="btn-3d btn-red" style="flex: 1;">إغلاق ✖️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. نافذة الأصدقاء والدعوات (المكان الصحيح والوحيد لإضافة الأصدقاء) -->
+    <div id="friends-modal" class="screen-container hidden" style="z-index: 80; background: rgba(0,0,0,0.7);">
+        <div class="game-panel" style="width: 95%; max-width: 400px; height: 80vh; display: flex; flex-direction: column;">
+            <h2 style="color: #3B82F6; margin-bottom: 15px; text-align: center;">👥 قائمة الأصدقاء</h2>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                <input type="text" id="add-friend-input" class="input-game" placeholder="أدخل ID الصديق..." maxlength="6" style="padding: 10px; text-transform: uppercase;">
+                <button id="btn-add-friend-action" class="btn-3d btn-green" style="width: auto; padding: 10px 15px; border-radius: 12px;">➕ إضافة</button>
+            </div>
+            <div id="friends-list-container" style="flex: 1; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+            </div>
+            <button id="btn-close-friends" class="btn-3d btn-red" style="margin-top: 15px;">عودة للوبي</button>
+        </div>
+    </div>
+
+    <!-- 7. الإعدادات -->
+    <div id="settings-modal" class="screen-container hidden" style="z-index: 80; background: rgba(0,0,0,0.7);">
+        <div class="game-panel" style="width: 90%; max-width: 350px;">
+            <h2 style="color: white; margin-bottom: 25px; text-align: center;">⚙️ الإعدادات</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <span style="font-size: 16px; font-weight: bold;">المؤثرات الصوتية 🎵</span>
+                <input type="checkbox" id="toggle-sfx" checked style="width: 20px; height: 20px;">
+            </div>
+            <button id="btn-close-settings" class="btn-3d btn-red" style="margin-top: 20px;">إغلاق</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script src="js/firebase.js"></script> 
+    <script src="js/auth.js"></script>
+    <script src="js/room.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/endgame.js"></script>
+</body>
+</html>
