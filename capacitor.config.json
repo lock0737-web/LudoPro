@@ -1,0 +1,6 @@
+{
+  "appId": "com.sufi.ludopro",
+  "appName": "Ludo Pro",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
